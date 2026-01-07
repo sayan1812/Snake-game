@@ -38,6 +38,7 @@ let snake = [
   },
 ];
 
+// # Generate a grid of blocks and map each cell using row-col coordinates
 for (let row = 0; row < rows; row++) {
   for (let col = 0; col < cols; col++) {
     const block = document.createElement("div");
@@ -47,11 +48,16 @@ for (let row = 0; row < rows; row++) {
   }
 }
 
+// # Render one game frame
 function render() {
   let head = null;
-
+// # Place food on the board at its current position
   blocks[`${food.x}-${food.y}`].classList.add("food");
-
+// # Calculate next head position based on current direction
+// #   If left  → move head left
+// #   If right → move head right
+// #   If down  → move head down
+// #   If up    → move head up
   if (direction === "left") {
     head = { x: snake[0].x, y: snake[0].y - 1 };
   } else if (direction === "right") {
@@ -61,7 +67,8 @@ function render() {
   } else if (direction === "up") {
     head = { x: snake[0].x - 1, y: snake[0].y };
   }
-  // 
+// # Check wall collision
+// #   If head goes outside grid → stop game → show game over modal
   if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
     clearInterval(IntervalId);
     modal.style.display = "flex";
@@ -70,7 +77,8 @@ function render() {
 
     return;
   }
-  // GAME OVER if snake hits its own body
+// # Check self collision
+// #   If head overlaps any snake body segment → stop game → game over
   if (snake.some((segment) => segment.x === head.x && segment.y === head.y)) {
     clearInterval(IntervalId);
     modal.style.display = "flex";
@@ -78,7 +86,14 @@ function render() {
     gameOverModal.style.display = "flex";
     return;
   }
-
+// # Check food collision
+// #   If head reaches food position
+// #     Remove food from current cell
+// #     Generate new random food position
+// #     Add food to new cell
+// #     Increase snake length
+// #     Increase score
+// #     Update high score in localStorage if needed
   if (head.x == food.x && head.y == food.y) {
     blocks[`${food.x}-${food.y}`].classList.remove("food");
     food = {
@@ -96,18 +111,21 @@ function render() {
       localStorage.setItem("highScore", highScore.toString());
     }
   }
-
+// # Clear previous snake body from board
   snake.forEach((segment) => {
     blocks[`${segment.x}-${segment.y}`].classList.remove("fill");
   });
+// # Move snake forward
+// #   Add new head to front
+// #   Remove last tail segment
   snake.unshift(head);
   snake.pop();
-
+// # Draw updated snake body on board
   snake.forEach((segment) => {
     blocks[`${segment.x}-${segment.y}`].classList.add("fill");
   });
 }
-
+// # Initialize game state, reset score, start snake movement and game timer
 startbutton.addEventListener("click", () => {
   localStorage.removeItem("highScore");
   let highScore = 0;
@@ -130,6 +148,7 @@ startbutton.addEventListener("click", () => {
   }, 1000);
 });
 
+// # Reset all game states and restart snake movement from initial position
 restartButton.addEventListener("click", restartGame);
 
 function restartGame() {
@@ -163,6 +182,19 @@ function restartGame() {
   direction = "down";
 }
 
+// # Listen for keyboard keydown events
+
+// # If ArrowUp key is pressed
+// #   Change snake direction to up
+
+// # If ArrowDown key is pressed
+// #   Change snake direction to down
+
+// # If ArrowRight key is pressed
+// #   Change snake direction to right
+
+// # If ArrowLeft key is pressed
+// #   Change snake direction to left
 addEventListener("keydown", (event) => {
   if (event.key == "ArrowUp") {
     direction = "up";
